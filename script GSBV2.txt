@@ -1,0 +1,90 @@
+drop database gsbv3;
+create database gsbv3;
+use gsbv3;
+
+CREATE TABLE FraisForfait(
+id varchar (20),
+libelle varchar (30),
+montant decimal,
+primary key (id))engine=innoDB;
+
+CREATE TABLE Etat(
+id varchar(20),
+libelle varchar(30),
+primary key (id))engine=innoDB;
+
+create table ordinateur(numOrdi int primary key,
+secteur varchar(10),
+indeminte int,
+dateIndemnite date);
+
+create table metierSante(numMetierSante int primary key,
+adresse varchar(30),
+libProfession varchar(20),
+medicamentPrecon varchar(20),
+numEtablissement int);
+
+CREATE TABLE Visiteur(
+id varchar(20),
+nom varchar(20),
+prenom varchar(20),
+login varchar(20),
+mdp varchar(20),
+adresse varchar(30),
+cp int(10),
+ville varchar(30),
+embauche date,
+typeVisiteur varchar(20), 
+idMetier int,
+adresseMail varchar(40),
+numOrdi int,
+foreign key(idMetier) REFERENCES metierSante(numMetierSante),
+FOREIGN KEY(numOrdi) REFERENCES ordinateur(numOrdi),
+primary key (id))engine=innoDB;
+
+CREATE TABLE FicheFrais(
+idVisiteur varchar(20),
+mois int (4),
+nbJustificatifs int (10),
+montantValide decimal,
+dateModif date,
+idEtat varchar(20),
+primary key (idVisiteur,mois),
+foreign key (idEtat) references Etat(id),
+foreign key (idVisiteur) references Visiteur(id))engine=innoDB;
+
+CREATE TABLE LigneFraisForfait(
+idVisiteur varchar(20),
+mois int(4),
+idFraisForfait varchar (20),
+quantite decimal,
+primary key (idVisiteur, mois, idFraisForfait),
+foreign key (idVisiteur,mois) references FicheFrais(idVisiteur,mois),
+foreign key (idFraisForfait) references FraisForfait(id)) engine=innoDB;
+
+CREATE TABLE LigneFraisHorsForfait(id int not null auto_increment,
+idVisiteur varchar (20),
+mois int(4),
+libelle varchar (20),
+dateHF date,
+montant decimal,
+primary key (id),
+foreign key (idVisiteur,mois) references FicheFrais(idVisiteur,mois))engine=innoDB; 
+
+/* modification au lieu de fk sur Visiteur fk sur Fichefrais(idVisiteur)
+
+/*create table fraishorsforfait(id int NOT NULL AUTO_INCREMENT,
+
+dateEngagement date,
+
+libelle varchar(50),
+
+montant decimal,
+
+primary key(id));*/
+
+
+create table indemnite(idVisiteur varchar(20),
+montant decimal,
+dateDerniereIndem date,
+foreign key(idVisiteur) REFERENCES visiteur(id));
